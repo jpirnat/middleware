@@ -3,37 +3,36 @@ declare(strict_types=1);
 
 namespace Jp\Middleware;
 
-use Interop\Http\Factory\ResponseFactoryInterface;
+use Closure;
 use Interop\Http\ServerMiddleware\DelegateInterface;
 use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class MiddlewareDispatcher implements DelegateInterface
+class Dispatcher implements DelegateInterface
 {
     /** @var string[] $middlewares */
     protected $middlewares = [];
 
-    /** @var ResponseFactoryInterface $responseFactory */
-    protected $responseFactory;
-
     /** @var ContainerInterface $container */
     protected $container;
+
+    /** @var Closure $app */
+    protected $app;
 
     /**
      * Constructor.
      *
-     * @param ResponseFactoryInterface $responseFactory
      * @param ContainerInterface $container
+     * @param Closure $app
      */
     public function __construct(
-        ResponseFactoryInterface $responseFactory,
-        ContainerInterface $container
+        ContainerInterface $container,
+        Closure $app
     ) {
-
-        $this->responseFactory = $responseFactory;
         $this->container = $container;
+        $this->app = $app;
     }
 
     /**
@@ -72,8 +71,9 @@ class MiddlewareDispatcher implements DelegateInterface
     public function process(ServerRequestInterface $request) : ResponseInterface
     {
         if (!$middleware = array_shift($this->middlewares)) {
-            // Default response.
-            $response = $this->responseFactory->createResponse(200);
+            // At the center of the middleware stack, an application turns the
+            // request into a response.
+            $response = ($this->app)($request);
 
             return $response;
         }
