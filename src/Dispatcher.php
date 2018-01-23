@@ -4,13 +4,12 @@ declare(strict_types=1);
 namespace Jp\Middleware;
 
 use Closure;
-use Interop\Http\ServerMiddleware\DelegateInterface;
-use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 
-class Dispatcher implements DelegateInterface
+class Dispatcher implements RequestHandlerInterface
 {
     /** @var string[] $middlewares */
     protected $middlewares = [];
@@ -62,13 +61,13 @@ class Dispatcher implements DelegateInterface
     }
 
     /**
-     * Dispatch the next available middleware and return the response.
+     * Dispatch the app through the middleware stack and return the response.
      *
      * @param ServerRequestInterface $request
      *
      * @return ResponseInterface
      */
-    public function process(ServerRequestInterface $request) : ResponseInterface
+    public function handle(ServerRequestInterface $request) : ResponseInterface
     {
         if (!$middleware = array_shift($this->middlewares)) {
             // At the center of the middleware stack, an application turns the

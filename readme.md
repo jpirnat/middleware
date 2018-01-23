@@ -11,9 +11,9 @@ $app = function (ServerRequestInterface $request) : ResponseInterface {
 $dispatcher = new Dispatcher($container, $app);
 
 $dispatcher->addMiddlewares([
-    ExampleMiddleware::class,
+    ExampleMiddleware::class, // identifiers for $container
     // ...
 ]);
 
-$response = $dispatcher->process($request);
+$response = $dispatcher->handle($request);
 ```
