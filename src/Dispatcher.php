@@ -11,14 +11,11 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 class Dispatcher implements RequestHandlerInterface
 {
+    private ContainerInterface $container;
+    private Closure $app;
+
     /** @var string[] $middlewares */
-    protected $middlewares = [];
-
-    /** @var ContainerInterface $container */
-    protected $container;
-
-    /** @var Closure $app */
-    protected $app;
+    private array $middlewares = [];
 
     /**
      * Constructor.
